@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LUMO - Check in. Breathe out.</title>
+<style>
+:root {
+    --blue: #3b82f6;
+    --blue-dark: #1e3a8a;
+    --light: #dbeafe;
+    --bg: #f0f6ff;
+    --green: #00A651;
+    --card-bg: #ffffff;
+    --text-color: #1e3a8a;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    margin: 0;
+    color: var(--text-color);
+    padding-bottom: 40px;
+    transition: background 0.5s ease;
+}
+
+header {
+    text-align: center;
+    padding: 28px 16px 12px;
+}
+
+h1 {
+    letter-spacing: 6px;
+    margin: 0;
+    font-size: 38px;
+    font-weight: 800;
+}
+
+.tag {
+    color: var(--blue);
+    margin: 6px 0;
+    font-weight: 500;
+}
+
+.small {
+    font-size: 13px;
+    color: #64748b;
+}
+
+.card {
+    background: var(--card-bg);
+    max-width: 400px;
+    margin: 16px auto;
+    border-radius: 24px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    box-sizing: border-box;
+}
+
+/* Tab Switcher */
+.tab-container {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    max-width: 400px;
+    margin: 0 auto 12px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 12px;
+    background: #e2e8f0;
+    color: #475569;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.tab-btn.active {
+    background: var(--blue);
+    color: white;
+}
+
+/* Breathing Circle */
+.breathe-circle {
+    width: 140px;
+    height: 140px;
+    background: var(--light);
+    border-radius: 50%;
+    margin: 16px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    transition: transform 4s ease-in-out, background-color 0.5s ease;
+}
+
+/* Mood Grid */
+.mood-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.mood-btn {
+    background: var(--light);
+    border: none;
+    border-radius: 16px;
+    padding: 14px;
+    font-size: 15px;
+    cursor: pointer;
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+.mood-btn:active {
+    transform: scale(0.96);
+}
+
+textarea, input {
+    width: 100%;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 12px;
+    box-sizing: border-box;
+    font-size: 14px;
+    outline: none;
+}
+
+textarea:focus, input:focus {
+    border-color: var(--blue);
+}
+
+textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.tool-btn {
+    background: var(--blue);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 11px 16px;
+    margin: 6px 0;
+    cursor: pointer;
+    font-weight: 600;
+    width: 100%;
+}
+
+.tool-btn:active {
+    opacity: 0.9;
+}
+
+.btn-secondary {
+    background: #e2e8f0;
+    color: #334155;
+}
+
+ul {
+    padding-left: 20px;
+    margin: 10px 0 0;
+}
+
+li {
+    margin-bottom: 6px;
+}
+
+.donate-card {
+    border: 2px dashed var(--blue);
+    background: #f8fbff;
+}
+
+.script-card {
+    background: #f1f5f9;
+    border-left: 4px solid var(--blue);
+    padding: 10px;
+    border-radius: 0 8px 8px 0;
+    margin: 8px 0;
+    font-size: 13px;
+    text-align: left;
+}
+
+a {
+    color: var(--blue);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+</style>
+</head>
+<body>
+
+<header>
+    <h1>LUMO</h1>
+    <p class="tag">Check in. Breathe out.</p>
+    <p class="small">Private • Offline • Free when you need it most</p>
+</header>
+
+<div class="tab-container">
+    <button id="tabSelf" class="tab-btn active" onclick="switchView('self')">For Yourself</button>
+    <button id="tabOther" class="tab-btn" onclick="switchView('other')">Supporting Someone</button>
+</div>
+
+<!-- ================= FOR YOURSELF VIEW ================= -->
+<div id="selfView">
+    <!-- Mood -->
+    <div class="card" style="text-align:center">
+        <h3>How are you right now?</h3>
+        <div class="mood-grid">
+            <button class="mood-btn" onclick="check('good')">😊 Good</button>
+            <button class="mood-btn" onclick="check('okay')">🙂 Okay</button>
+            <button class="mood-btn" onclick="check('low')">😔 Low</button>
+            <button class="mood-btn" onclick="check('anxious')">😰 Anxious</button>
+        </div>
+        <p id="moodMsg" class="small" style="margin-top:12px; font-weight: 500; min-height: 18px;"></p>
+    </div>
+
+    <!-- Breathe -->
+    <div class="card" style="text-align:center">
+        <h3>1. Breathe (Box Method)</h3>
+        <div id="circle" class="breathe-circle">
+            <b id="bText">Breathe</b>
+            <small id="bSmall">tap start</small>
+        </div>
+        <button class="tool-btn" onclick="startBreath()">Start 1 Min Box Breathing</button>
+    </div>
+
+    <!-- Dump It -->
+    <div class="card">
+        <h3>2. Dump It & Shred</h3>
+        <textarea id="dump" placeholder="Write what's heavy... no one will ever save or see this."></textarea>
+        <button class="tool-btn" onclick="shred()">Shred it 🗑️</button>
+        <button class="tool-btn btn-secondary" onclick="document.getElementById('dump').value=''">Clear Text</button>
+    </div>
+
+    <!-- Move -->
+    <div class="card" style="text-align:center">
+        <h3>3. Move 2 Minutes</h3>
+        <p class="small">Gentle stretching or walking changes physiology fast.</p>
+        <div id="moveTimer" style="font-size:32px;font-weight:700;margin:10px 0;">02:00</div>
+        <button class="tool-btn" onclick="startMove()">Start 2-Min Timer</button>
+    </div>
+
+    <!-- Safe Contact -->
+    <div class="card">
+        <h3>4. Safe Connections</h3>
+        <p class="small">Add trusted contacts (Saved locally on your device only):</p>
+        <input id="p1" placeholder="Contact 1 (Phone number)" style="margin:4px 0">
+        <input id="p2" placeholder="Contact 2 (Phone number)" style="margin:4px 0">
+        <button class="tool-btn" onclick="savePeople()">Save Numbers</button>
+
+        <div id="quickCallBtns" style="margin-top:10px;"></div>
+
+        <p class="small" style="margin-top:12px;">
+            Need professional crisis support?<br>
+            • Kenya: <a href="tel:1199">1199 (Red Cross)</a> / <a href="tel:0722178177">Befrienders KE</a><br>
+            • Global: <a href="https://findahelpline.com/" target="_blank">findahelpline.com</a>
+        </p>
+    </div>
+
+    <!-- Gratitude -->
+    <div class="card">
+        <h3>5. Tiny Gratitude Anchor</h3>
+        <div style="display:flex; gap:6px;">
+            <input id="grat" placeholder="1 small good thing today...">
+            <button class="tool-btn" onclick="addGrat()" style="width:70px">Add</button>
+        </div>
+        <ul id="gratList"></ul>
+    </div>
+
+    <!-- Sleep Wind-Down -->
+    <div class="card" style="text-align:center; background:#1e293b; color:white">
+        <h3 style="color:white">6. Sleep Wind-Down</h3>
+        <p class="small" style="color:#94a3b8">Rain sound timer & dims screen.</p>
+        <button class="tool-btn" onclick="sleepMode()">Start Sleep Rain (15 Min) 🌧️</button>
+        <audio id="rain" loop src="https://cdn.pixabay.com/audio/2022/03/10/audio_c3c8c6f3a8.mp3"></audio>
+    </div>
+</div>
+
+<!-- ================= SUPPORTING SOMEONE VIEW ================= -->
+<div id="otherView" style="display:none;">
+    <div class="card">
+        <h3>How to Help Someone Online</h3>
+        <p class="small">Supporting a friend going through depression requires validation, clear options, and healthy boundaries.</p>
+
+        <h4>1. Safe Text Responses to Copy:</h4>
+        <div class="script-card">
+            "I'm so sorry things feel heavy right now. You don't have to navigate this alone. No need to text back right away—just wanted you to know I'm here."
+            <button class="tool-btn btn-secondary" style="margin-top:6px; padding:4px 8px; font-size:12px;" onclick="navigator.clipboard.writeText(this.parentElement.innerText.split('\n')[0]); alert('Copied to clipboard!')">Copy Script</button>
+        </div>
+
+        <div class="script-card">
+            "Do you want to vent and have me listen, or would you like to brainstorm ideas together? I'm okay with whichever you need."
+            <button class="tool-btn btn-secondary" style="margin-top:6px; padding:4px 8px; font-size:12px;" onclick="navigator.clipboard.writeText(this.parentElement.innerText.split('\n')[0]); alert('Copied to clipboard!')">Copy Script</button>
+        </div>
+
+        <h4>2. Key Rules:</h4>
+        <ul class="small" style="line-height: 1.5;">
+            <li><b>Avoid fixing:</b> Resist saying "Just cheer up" or giving simple unsolicited advice.</li>
+            <li><b>Validate feelings:</b> Acknowledge that their pain is real.</li>
+            <li><b>Protect your own boundaries:</b> You cannot replace a professional counselor. Offer support, but encourage professional help when appropriate.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- ================= DONATION CARD ================= -->
+<div class="card donate-card" style="text-align:center">
+    <h3>❤️ Keep LUMO Free</h3>
+    <p class="small">LUMO is free for everyone in a low moment. If it helped you, help keep it alive for the next person.</p>
+    
+    <div style="display:flex; gap:8px; margin-bottom:10px;">
+        <button class="tool-btn" style="background:var(--green); flex:1;" onclick="togglePay('mpesa')">M-Pesa / Mobile</button>
+        <button class="tool-btn" style="background:#0070BA; flex:1;" onclick="togglePay('paypal')">PayPal / Card</button>
+    </div>
+
+    <!-- M-Pesa Info -->
+    <div id="mpesaInfo" style="display:none; background:white; border-radius:12px; padding:14px; margin:10px 0; text-align:left; font-size:13px; border:1px solid #cbd5e1;">
+        <b style="color:var(--green); font-size:14px;">Option A: Send Money (Mobile Number)</b><br>
+        1. Go to M-Pesa / Mobile Money menu<br>
+        2. Select <b>Send Money</b><br>
+        3. Enter Phone Number: <b style="font-size:15px; color:#1e293b;">07XX XXX XXX</b><br>
+        4. Name: <b>[Your Name]</b><br>
+        <hr style="border:0; border-top:1px dashed #cbd5e1; margin:8px 0;">
+        <b style="color:var(--green); font-size:14px;">Option B: Till / Pochi La Biashara</b><br>
+        1. Select <b>Buy Goods & Services</b> or <b>Pochi La Biashara</b><br>
+        2. Till / Number: <b style="font-size:15px; color:#1e293b;">XXXXXX</b><br>
+        <hr style="border:0; border-top:1px dashed #cbd5e1; margin:8px 0;">
+        <small style="color:#64748b;">Asante sana! 🙏 Your support keeps LUMO hosting online.</small>
+    </div>
+
+    <!-- PayPal Info -->
+    <div id="paypalInfo" style="display:none; background:white; border-radius:12px; padding:14px; margin:10px 0; text-align:left; font-size:13px; border:1px solid #cbd5e1;">
+        <b>Support via PayPal or Credit/Debit Card</b><br>
+        <p class="small" style="margin:6px 0;">Click below to open secure payment link:</p>
+        <a href="https://paypal.me/YOUR_PAYPAL_HANDLE" target="_blank" class="tool-btn" style="display:block; text-align:center; text-decoration:none; background:#0070BA;">Pay via PayPal</a>
+    </div>
+
+    <p class="small" id="donorCount" style="margin-top:12px; color:var(--blue); font-weight:600;"></p>
+</div>
+
+<!-- ================= ADMIN DASHBOARD ================= -->
+<div style="text-align: center; margin-top: 30px;">
+  <button onclick="accessAdmin()" style="background: none; border: none; color: #94a3b8; font-size: 11px; cursor: pointer;">
+    ⚙️ Admin Dashboard
+  </button>
+</div>
+
+<div id="adminDashboard" class="card" style="display: none; border: 2px solid var(--blue); background: #f8fafc;">
+  <h3 style="margin-top:0;">📊 LUMO Local Admin</h3>
+  
+  <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+    <div style="flex:1; background:white; padding:10px; border-radius:12px; text-align:center; box-shadow:0 2px 6px rgba(0,0,0,0.04);">
+      <small>Latest Mood</small>
+      <div id="statMoods" style="font-size:16px; font-weight:700; color:var(--blue)">None</div>
+    </div>
+    <div style="flex:1; background:white; padding:10px; border-radius:12px; text-align:center; box-shadow:0 2px 6px rgba(0,0,0,0.04);">
+      <small>Gratitude Items</small>
+      <div id="statGratitude" style="font-size:16px; font-weight:700; color:var(--green)">0</div>
+    </div>
+  </div>
+
+  <h4>Activity Record:</h4>
+  <ul id="adminLogs" class="small" style="max-height: 150px; overflow-y: auto; background: white; padding: 10px 25px; border-radius: 12px; border: 1px solid #e2e8f0;">
+    <li>No records logged yet.</li>
+  </ul>
+
+  <button class="tool-btn btn-secondary" onclick="exportData()" style="margin-top:10px;">📥 Export Data (JSON)</button>
+  <button class="tool-btn" style="background:#ef4444;" onclick="document.getElementById('adminDashboard').style.display='none'">Close Admin</button>
+</div>
+
+<p class="small" style="text-align:center; margin-top:20px; padding:0 10px;">
+    LUMO • Built with care • Not medical advice. If you or someone you know is in danger, please reach out to local emergency services.
+</p>
+
+<script>
+// TAB SWITCHING
+function switchView(view) {
+    if(view === 'self') {
+        document.getElementById('selfView').style.display = 'block';
+        document.getElementById('otherView').style.display = 'none';
+        document.getElementById('tabSelf').classList.add('active');
+        document.getElementById('tabOther').classList.remove('active');
+    } else {
+        document.getElementById('selfView').style.display = 'none';
+        document.getElementById('otherView').style.display = 'block';
+        document.getElementById('tabOther').classList.add('active');
+        document.getElementById('tabSelf').classList.remove('active');
+    }
+}
+
+// MOOD
+function check(m){
+    const msg = {
+        good: "Glad to hear! Spread that warmth to someone today.",
+        okay: "Okay is totally fine. Take it one moment at a time.",
+        low: "I'm with you. Try the 1-min breathing or 'Dump It' to unburden.",
+        anxious: "Anxiety is tough. Let's do 1 minute of Box Breathing together."
+    };
+    document.getElementById('moodMsg').innerText = msg[m];
+    localStorage.setItem('lastMood', m + ' (' + new Date().toLocaleTimeString() + ')');
+}
+
+// BREATHE
+let breathInt;
+function startBreath(){
+    let i = 0; 
+    const phases = ["Inhale (4s)", "Hold (4s)", "Exhale (4s)", "Hold (4s)"];
+    const c = document.getElementById('circle'), t = document.getElementById('bText'), s = document.getElementById('bSmall');
+    clearInterval(breathInt);
+    
+    t.innerText = "Inhale";
+    s.innerText = phases[0];
+    c.style.transform = "scale(1.25)";
+    c.style.backgroundColor = "#bfdbfe";
+    
+    breathInt = setInterval(() => {
+        i++;
+        const phaseIdx = i % 4;
+        t.innerText = phases[phaseIdx].split(' ')[0]; 
+        s.innerText = phases[phaseIdx];
+        
+        if(phaseIdx === 0) {
+            c.style.transform = "scale(1.25)";
+            c.style.backgroundColor = "#bfdbfe";
+        } else if (phaseIdx === 2) {
+            c.style.transform = "scale(1.0)";
+            c.style.backgroundColor = "#dbeafe";
+        }
+        
+        if(i >= 15){
+            clearInterval(breathInt); 
+            t.innerText = "Done"; 
+            s.innerText = "Well done • Tap to restart"; 
+            c.style.transform = "scale(1)";
+        }
+    }, 4000);
+}
+
+// DUMP
+function shred(){
+    const d = document.getElementById('dump'); 
+    if(!d.value) return; 
+    d.value = ""; 
+    d.placeholder = "Shredded completely. Take a deep breath.";
+}
+
+// MOVE
+let moveSec = 120, moveInt;
+function startMove(){
+    clearInterval(moveInt);
+    moveSec = 120;
+    moveInt = setInterval(() => {
+        moveSec--; 
+        let m = Math.floor(moveSec/60), sec = moveSec % 60;
+        document.getElementById('moveTimer').innerText = (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+        if(moveSec <= 0){
+            clearInterval(moveInt); 
+            alert("2 minutes complete! Great job changing your posture."); 
+            document.getElementById('moveTimer').innerText = "02:00";
+        }
+    }, 1000);
+}
+
+// SAVE PEOPLE
+function savePeople(){
+    const p1 = document.getElementById('p1').value;
+    const p2 = document.getElementById('p2').value;
+    localStorage.setItem('p1', p1); 
+    localStorage.setItem('p2', p2); 
+    renderQuickContacts();
+    alert("Contacts saved on your phone!");
+}
+
+function renderQuickContacts() {
+    const p1 = localStorage.getItem('p1');
+    const p2 = localStorage.getItem('p2');
+    const container = document.getElementById('quickCallBtns');
+    container.innerHTML = "";
+    if(p1) container.innerHTML += `<a href="tel:${p1}" class="tool-btn btn-secondary" style="display:inline-block; text-align:center; width:48%; box-sizing:border-box;">📞 Call ${p1}</a> `;
+    if(p2) container.innerHTML += `<a href="tel:${p2}" class="tool-btn btn-secondary" style="display:inline-block; text-align:center; width:48%; box-sizing:border-box;">📞 Call ${p2}</a>`;
+}
+
+document.getElementById('p1').value = localStorage.getItem('p1') || ""; 
+document.getElementById('p2').value = localStorage.getItem('p2') || "";
+renderQuickContacts();
+
+// GRATITUDE
+function addGrat(){
+    const v = document.getElementById('grat').value; 
+    if(!v) return;
+    let list = JSON.parse(localStorage.getItem('grat') || "[]"); 
+    list.push(v); 
+    localStorage.setItem('grat', JSON.stringify(list));
+    document.getElementById('grat').value = ""; 
+    renderGrat();
+}
+
+function renderGrat(){
+    const list = JSON.parse(localStorage.getItem('grat') || "[]"); 
+    document.getElementById('gratList').innerHTML = list.slice(-5).reverse().map(x => "<li>" + x + "</li>").join("");
+}
+renderGrat();
+
+// DONATION TOGGLE
+function togglePay(type) {
+    const mpesa = document.getElementById('mpesaInfo');
+    const paypal = document.getElementById('paypalInfo');
+
+    if (type === 'mpesa') {
+        mpesa.style.display = mpesa.style.display === 'none' ? 'block' : 'none';
+        paypal.style.display = 'none';
+    } else if (type === 'paypal') {
+        paypal.style.display = paypal.style.display === 'none' ? 'block' : 'none';
+        mpesa.style.display = 'none';
+    }
+}
+
+let count = Math.floor(Math.random() * 25) + 35; 
+document.getElementById('donorCount').innerText = "💙 " + count + " supporters kept LUMO online this month";
+
+// SLEEP
+function sleepMode(){
+    document.body.style.background = "#0f172a"; 
+    const a = document.getElementById('rain'); 
+    a.play().catch(()=>{}); 
+    setTimeout(() => {
+        a.pause(); 
+        document.body.style.background = "";
+    }, 15 * 60 * 1000); 
+    alert("15-minute rain sound started. Dimming screen...");
+}
+
+// ADMIN DASHBOARD
+function accessAdmin() {
+  const pass = prompt("Enter Admin Password:");
+  if (pass === "admin123") {
+    document.getElementById('adminDashboard').style.display = 'block';
+    loadAdminStats();
+  } else if (pass !== null) {
+    alert("Incorrect password.");
+  }
+}
+
+function loadAdminStats() {
+  const gratList = JSON.parse(localStorage.getItem('grat') || "[]");
+  const lastMood = localStorage.getItem('lastMood') || "None recorded";
+  
+  document.getElementById('statGratitude').innerText = gratList.length;
+  document.getElementById('statMoods').innerText = lastMood;
+  
+  const logsUl = document.getElementById('adminLogs');
+  logsUl.innerHTML = `
+    <li><b>Latest Mood:</b> ${lastMood}</li>
+    <li><b>Total Gratitude Entries:</b> ${gratList.length}</li>
+    <li><b>Saved Emergency Contact 1:</b> ${localStorage.getItem('p1') ? 'Yes' : 'No'}</li>
+    <li><b>Saved Emergency Contact 2:</b> ${localStorage.getItem('p2') ? 'Yes' : 'No'}</li>
+  `;
+}
+
+function exportData() {
+  const data = {
+    gratitude: JSON.parse(localStorage.getItem('grat') || "[]"),
+    lastMood: localStorage.getItem('lastMood'),
+    p1: localStorage.getItem('p1'),
+    p2: localStorage.getItem('p2')
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "lumo_analytics.json";
+  a.click();
+}
+</script>
+</body>
+</html>
